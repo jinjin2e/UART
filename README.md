@@ -1,5 +1,24 @@
 # UART 데이터 패킷 및 통신
 ## UART
+## ST function (interrupt)
+> ```
+> 수신부
+> HAL_UART_Receive_IT( UART 핸들, 수신 버퍼의 포인터, 수신 데이터 크기 );      // UART 데이터 수신이 이루어졌을 때 인터럽트를 발생시키도록 설정하는 함수 / 위치는 main 함수 내부 while 시작 전 (user code 2) + HAL_UART_RxCpltCallback() 내부 
+> 수신 버퍼의 타입 == unsigned chat*
+> 수신 데이터 크기 == 설정한 크기만큼 데이터를 수신받았을 때 인터럽트를 발생 (byte)
+> 설정한 크기만큼의 데이터 수신이 완료되면 HAL_UART_RxCpltCallback() 함수를 호출함 -> 이 함수 안에서 할 일을 작성
+>
+> 송신부
+> HAL_StatusTypeDef HAL_UART_Transmit_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
+> huart: uart 인스턴스
+> pData: 송신 데이터 버퍼
+> Size: 송신 데이터 개수
+> Uart 송신 인터럽트 함수: Uart Tx로 데이터를 Size만큼 전송하면 인터럽트가 발생한다
+> ```
+> HAL_UART_RxCpltCallback() 에서 해야할 일 
+>
+> 1. 수신 버퍼의 데이터를 다른 버퍼에 저장. / 수신 버퍼는 수신시에만 사용하는 버퍼이므로 데이터를 어느 정도 쌓아두고 처리할 때는 별도의 버퍼 사용하는 것이 좋음.
+> 2. HAL_UART_Receive_IT 호출 / user code 2 에서 설정한 HAL_UART_Receive_IT()는 1회용임 -> 첫 바이트를 수신하면 해당 설정을 비활성화함 그렇기 때문에 다시 수신 인터럽트 설정을 해줘야 함.
 
 
 ## 패킷

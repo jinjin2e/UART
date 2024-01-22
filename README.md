@@ -19,6 +19,26 @@
 >
 > 1. 수신 버퍼의 데이터를 다른 버퍼에 저장. / 수신 버퍼는 수신시에만 사용하는 버퍼이므로 데이터를 어느 정도 쌓아두고 처리할 때는 별도의 버퍼 사용하는 것이 좋음.
 > 2. HAL_UART_Receive_IT 호출 / user code 2 에서 설정한 HAL_UART_Receive_IT()는 1회용임 -> 첫 바이트를 수신하면 해당 설정을 비활성화함 그렇기 때문에 다시 수신 인터럽트 설정을 해줘야 함.
+> ```C
+> 예제)
+>
+> void HAL_UART_RxCpltCallback(UART_HandleTypeDef* uartHandle)
+> {
+>     rx_buff[buff_count] = rx_buff_temp[0];
+>     buff_count += 1;
+>
+>     if (buff_count == 256)
+>     {
+>           buff_count = 0;
+>     }
+>
+>     HAL_UART_Receive_IT(&huart3, rx_buff_temp, RX_BUFF_SIZE);
+> }
+위 코드에서 rx_buff_temp는 크기가 1Byte인 수신 버퍼이며, rx_buff는 크기가 256Byte인 데이터 처리용 버퍼임.
+그리고 buff_count는 데이터 처리용 버퍼의 현재 인덱스 값을 의미함. 데이터를 계속 수신하다가 인덱스 값이 256이 되면 다시 0으로 바꾸어 순환하도록 함.
+마지막 줄에는 UART 수신 인터럽트 활성 설정을 하는 함수를 사용.
+ 
+
 
 
 ## 패킷
